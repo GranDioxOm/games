@@ -4,11 +4,17 @@ import pygame, time
 screenSize = (640, 400)
 screen = pygame.display.set_mode(screenSize)
 run = 1
+backcolor = (100, 100, 100)
 
 
-om = pygame.image.load('om.jpg').convert()
 omSize = (30,30)
+om = pygame.image.load('om.png').convert_alpha()
+
 om = pygame.transform.scale(om, omSize)
+balon = pygame.Surface(omSize)
+balon.fill(backcolor)
+balon.blit(om, (0,0))
+
 pos = [0,0]
 
 mov = [3,3]
@@ -27,7 +33,8 @@ while run:
   pos[0] += mov[0]
   pos[1] += mov[1]
 
-  screen.fill((0,0,0))
+  screen.fill(backcolor)
+
   screen.blit(om, pos)
 
   pygame.display.update()
