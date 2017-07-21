@@ -87,7 +87,7 @@ class Bush:
 
 class Chofli:
   def __init__(self, size, backcolor, pos):
-    image = pygame.transform.scale(pygame.image.load('img/chofli.png').convert_alpha(), size)
+    image = pygame.transform.scale(pygame.image.load('img/chofli2.png').convert_alpha(), size)
     self.tile = pygame.Surface(size)
     self.tile.fill(backcolor)
     self.tile.blit(image, (0,0))
@@ -147,28 +147,22 @@ class Chofli:
       
       touch = False
       for element in field.field:
-        if element.rect.collidepoint(futurepos):
+        if element.rect.collidepoint(futpos):
           self.direccion = element.pos
           touch = True
           break
 
-      if find:
-        self.action = 'move'
-        self.actualSearch = 0
-      else:
-        self.actualSearch += 1
+      #if find:
+      #  self.action = 'move'
+      #  self.actualSearch = 0
+      #else:
+      #  self.actualSearch += 1
 
 
 
       self.pos = futpos
 
       
-
-      
-
-
-
-
 
 
 class Warehouse:
@@ -204,8 +198,9 @@ class Tribe:
 
 
 SCREENSIZE = (600, 600)
-MUNDOSIZE = (30,30)
+MUNDOSIZE = (30, 30)
 TILESIZE = (SCREENSIZE[0]/MUNDOSIZE[0], SCREENSIZE[1]/MUNDOSIZE[1])
+CHOFLISIZE = (15, 15)
 
 
 #COLORGREEN = (100, 150, 35)
@@ -219,7 +214,7 @@ tribu = Tribe()
 
 center = (mundo.size[0]/2, mundo.size[1]/2)
 pos = (center[0]*TILESIZE[0]+TILESIZE[0]/2,(center[1]+1)*TILESIZE[1]+TILESIZE[1]/2)
-tribu.addMember(Chofli(mundo.sizeTile, COLORGREEN, pos))
+tribu.addMember(Chofli(CHOFLISIZE, COLORGREEN, pos))
 
 frame = 0
 run = 1
