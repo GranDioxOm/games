@@ -6,6 +6,7 @@ BACKCOLOR = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
 
 GRAVITY = 10000
 
@@ -57,15 +58,54 @@ class Planet:
   def __init__(self, size, pos, soi, screen):
     self.tile = pygame.Surface(size)
     pygame.draw.circle(self.tile, WHITE, (size[0]/2, size[1]/2), size[0]/2)
-    #self.tile.fill(WHITE)
     self.printPos = (pos[0] - size[0]/2, pos[1] - size[1]/2)
     self.realPos = pos
     self.size = size
     screen.addElement(self)
     self.soi = soi
+    self.direction = (0, 0)
+    self.moons = []
+
+  def move(self, vector):
+    self.direction = sumT(self.direction, vector)
+    futurePos = sumT(self.realPos, self.direction)
+    self.__newPos(futurePos)
+
+  def __newPos(self, futurePos):
+    self.realPos = futurePos
+    self.printPos = (futurePos[0] - self.size[0]/2, futurePos[1] - self.size[1]/2)
 
 
+class Sun:
+  def __init__(self, size, pos, screen):
+    self.tile = pygame.Surface(size)
+    pygame.draw.circle(self.tile, YELLOW, (size[0]/2, size[1]/2), size[0]/2)
+    self.printPos = (pos[0] - size[0]/2, pos[1] - size[1]/2)
+    self.realPos = pos
+    self.size = size
+    screen.addElement(self)
 
+class Moon:
+  def __init__(self, size, pos, screen):
+    self.tile = pygame.Surface(size)
+    pygame.draw.circle(self.tile, WHITE, (size[0]/2, size[1]/2), size[0]/2)
+    self.printPos = (pos[0] - size[0]/2, pos[1] - size[1]/2)
+    self.realPos = pos
+    self.size = size
+    screen.addElement(self)
+    self.direction = (0, 0)
+
+  def move(self, vector):
+    self.direction = sumT(self.direction, vector)
+    futurePos = sumT(self.realPos, self.direction)
+
+    self.__newPos(futurePos)
+
+  def __newPos(self, futurePos):
+    self.realPos = futurePos
+    self.printPos = (futurePos[0] - self.size[0]/2, futurePos[1] - self.size[1]/2)
+
+    
 class Screen:
   def __init__(self, size, surface):
     self.size = size
@@ -82,12 +122,8 @@ class Screen:
 
 
 
-def calcVector(org, dst):
-  #coseno = y
-  #seno = x 
-  #x = dst[0]-org[0]
-  #y = dst[1]-org[1]
 
+def calcVector(org, dst):
   xy = minusT(dst, org)
   x = xy[0]
   y = xy[1]
@@ -107,23 +143,9 @@ def calcVector(org, dst):
   if xy[1] < 0:
     diry *= -1
 
-  #print "direccion:"
-  #print  str(dirx) + " - " +  str(diry)
-
-  #print "distancia:"
-  #print math.hypot(x, y)
-
+  #Fuerza de la gravedad
   Fgrav = GRAVITY/(math.hypot(x, y)*100)#**2
-
-  #print "fuerza gravedad"
-  #print Fgrav
-
-  
   velocity = (dirx*Fgrav, diry*Fgrav)
-
-  #print "velocity : "
-  #print velocity
-
   return velocity
 
 
@@ -131,7 +153,7 @@ def calcDist(pos1, pos2):
   xy = minusT(pos1, pos2)
   print xy
   dist = math.hypot(xy[0], xy[1])
-  print dist
+  #print dist
   return dist
 
 
@@ -156,23 +178,34 @@ def createRk():
   
   
 
-
+planets = []
 rockets = []
 screen = Screen(SCREENSIZE, window)
 #rk = Rocket((4, 4), (100, 100), RED, screen)
 #rk2 = Rocket((4, 4), (200, 300), BLUE, screen)
-earth = Planet((30, 30), (200, 200), 500, screen)
-mars = Planet((20, 20), (400, 400), 200, screen)
+sun = Sun((20,20), (SCREENSIZE[0]/2, SCREENSIZE[1]/2), screen)
+earth = Planet((10, 10), (250, 300), 0, screen)
+mars = Planet((10, 10), (200, 300), 0, screen)
+saturn = Planet((10, 10), (150, 300), 0, screen)
+jupiter = Planet((10, 10), (100, 300), 0, screen)
+luna1 = Moon((5, 5), (115, 300), screen)
 
+planets.append(earth)
+planets.append(mars)
+planets.append(saturn)
+planets.append(jupiter)
+jupiter.moons.append(luna1)
 
-#screen.addElement(rk)
-#screen.addElement(rk2)
-#screen.addElement(earth)
 
 
 #rk.direction = (0, -10)
 #rk2.direction = (10, -10)
-mouse = False
+earth.direction = (0, -8.7)
+mars.direction = (0, -8.7)
+saturn.direction = (0, -8.7)
+jupiter.direction = (0, -8.7)
+luna1.direction = (0, 1.5)
+
 mouseInit = (0,0)
 mouseEnd = (0,0)
 #frame = 0
@@ -185,10 +218,8 @@ while run:
   if event.type == pygame.QUIT:
     run = 0
   elif event.type == pygame.MOUSEBUTTONDOWN:
-    mouse = True
     mouseInit = pygame.mouse.get_pos()
   elif event.type == pygame.MOUSEBUTTONUP:
-    mouse = False
     mouseEnd = pygame.mouse.get_pos()
     
     #createRk()
@@ -226,12 +257,19 @@ while run:
   #print pygame.event.wait()
   #print pygame.event.get()
 
-  for rk in rockets:
-    vector1 =  calcVector(rk.realPos, earth.realPos)
-    vector2 =  calcVector(rk.realPos, mars.realPos)
-    vector = sumT(vector1, vector2)
-    rk.move(vector)
-    
+  #for rk in rockets:
+  #  vector1 =  calcVector(rk.realPos, earth.realPos)
+  #  vector2 =  calcVector(rk.realPos, mars.realPos)
+  #  vector = sumT(vector1, vector2)
+  #  rk.move(vector)
+  
+  for planet in planets:
+    vector = calcVector(planet.realPos, sun.realPos)
+    planet.move(vector)
+    if len(planet.moons) > 0:
+      for moon in planet.moons:
+        vector = calcVector(moon.realPos, planet.realPos)
+        moon.move(vector)
 
   screen.printScreen()
   pygame.display.update()
