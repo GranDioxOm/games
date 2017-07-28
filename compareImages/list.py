@@ -1,19 +1,22 @@
 import os, Image
+import config
 
 ############# CONSTANTS ###############
 FORMATS = ('png', 'jpg')
-DIRECTORY = '/home/daniel'
-OUTPUTFILE = 'files.json'
+DIRECTORY = config.DIRECTORYTO
+OUTPUTFILE = config.TMPOUTPUTFILE
+
 
 ############# FUNCTIONS ###############
 
 def write_data(file, size):
 
-  output = "{'f':'" + file + "', 'w':" + str(size[0]) + ", 'h':" + str(size[1]) + "}\n"
+  output = '{"f":"' + file + '", "w":' + str(size[0]) + ', "h":' + str(size[1]) + "}\n"
   outfile.write(output)
 
 ################## RUN ################
-outfile = open(OUTPUTFILE, 'w') 
+outfile = open(OUTPUTFILE, 'w')
+
 
 for base, dirs, files in os.walk(DIRECTORY):
   for file in files:
